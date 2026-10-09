@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SOS-Rundgang">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b5cad">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>SOS-Rundgang</title>
+<style>
+:root{--bg:#f2f4f7;--card:#fff;--tx:#1b1f24;--mut:#69717d;--bd:#d6dbe2;--pri:#0b5cad;--pritx:#fff;--chip:#e9edf2;--hoch:#d92d20;--mittel:#f08c00;--niedrig:#d4a800;--ok:#15803d;--warn:#fff4d6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2027;--tx:#e8ebef;--mut:#98a1ad;--bd:#333b46;--pri:#4c9aff;--pritx:#04203f;--chip:#28303a;--warn:#3a3210}}
+:root[data-theme="dark"]{--bg:#111418;--card:#1b2027;--tx:#e8ebef;--mut:#98a1ad;--bd:#333b46;--pri:#4c9aff;--pritx:#04203f;--chip:#28303a;--warn:#3a3210}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:920px;margin:0 auto;padding:10px 12px 170px}
+h2{font-size:18px;margin:18px 0 8px}
+label,.lbl{display:block;font-weight:600;font-size:14px;margin:0 0 6px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);min-height:46px}
+textarea{resize:vertical}
+button{border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:11px 14px;min-height:46px;cursor:pointer}
+button.primary{background:var(--pri);color:var(--pritx);border-color:var(--pri);font-weight:600}
+button.danger{color:var(--hoch);border-color:var(--hoch)}
+button:active{opacity:.7}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1 1 auto}.row>button{flex:0 0 auto}
+.mut{color:var(--mut);font-size:14px}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.warn{background:var(--warn);border-color:#e0c34a}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips.scroll{max-height:132px;overflow:auto;padding:2px}
+.chip{background:var(--chip);border:1px solid var(--bd);border-radius:999px;padding:8px 14px;min-height:40px;font-size:15px}
+.chip.on{background:var(--pri);color:var(--pritx);border-color:var(--pri);font-weight:600}
+.chips.big .chip{min-width:64px;min-height:54px;font-size:20px;font-weight:700;border-radius:14px;text-align:center}
+.seg{display:flex;gap:8px}.seg button{flex:1;font-weight:600}
+.seg button.on[data-v="hoch"]{background:var(--hoch);color:#fff;border-color:var(--hoch)}
+.seg button.on[data-v="mittel"]{background:var(--mittel);color:#fff;border-color:var(--mittel)}
+.seg button.on[data-v="niedrig"]{background:var(--niedrig);color:#fff;border-color:var(--niedrig)}
+.seg button.on[data-s]{background:var(--pri);color:var(--pritx);border-color:var(--pri)}
+.seg button.on[data-s="erledigt"]{background:var(--ok);color:#fff;border-color:var(--ok)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0}
+.grid3{display:grid;grid-template-columns:150px 1fr 1fr;gap:8px}
+@media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}.grid3>:first-child{grid-column:1/-1}}
+.card{display:flex;gap:10px;background:var(--card);border:1px solid var(--bd);border-left:6px solid var(--mut);border-radius:12px;padding:10px;margin:8px 0}
+.card.p-hoch{border-left-color:var(--hoch)}.card.p-mittel{border-left-color:var(--mittel)}.card.p-niedrig{border-left-color:var(--niedrig)}
+.card.done{opacity:.6}
+.thumb{width:84px;height:84px;flex:0 0 84px;border-radius:8px;background:var(--chip);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:12px;color:var(--mut)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.cbody{min-width:0;flex:1}
+.l1{font-size:15px}.l2{font-size:14px;margin:2px 0}.l3{font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.l4{font-size:13px;color:var(--mut);margin-top:2px}.l4 .over{color:var(--hoch);font-weight:700}
+.acts{display:flex;gap:8px;margin-top:6px}.acts button{min-height:38px;padding:6px 12px;font-size:14px}
+.pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:13px;font-weight:600;color:#fff}
+.pill.p-hoch{background:var(--hoch)}.pill.p-mittel{background:var(--mittel)}.pill.p-niedrig{background:var(--niedrig)}
+.pill.s-offen{background:#6b7280}.pill.s-bearbeitung{background:var(--pri);color:var(--pritx)}.pill.s-erledigt{background:var(--ok)}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;border-radius:0;background:none;min-height:56px;font-size:13px;color:var(--mut)}
+nav button.on{color:var(--pri);font-weight:700}
+#fab{position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:19;border-radius:999px;padding:0 22px;min-height:56px;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.sheet{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column}
+.sheet-top{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;border-bottom:1px solid var(--bd);background:var(--card)}
+.sheet-top b{flex:1;text-align:center}
+.sheet-body{flex:1;overflow:auto;padding:12px;max-width:920px;width:100%;margin:0 auto}
+.sheet-body section{margin-bottom:18px}
+.sheet-bar{display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--bd);background:var(--card)}
+.sheet-bar button{flex:1}
+.photos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.ph{position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:2px solid var(--bd)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph.n{border-color:var(--ok)}
+.ph span{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;text-align:center}
+details summary{cursor:pointer;color:var(--pri);padding:8px 0;font-size:15px}
+#annot{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
+#annot .tb{display:flex;gap:6px;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px;flex-wrap:wrap;background:#222}
+#annot .tb button{min-height:42px;padding:6px 12px;background:#333;color:#fff;border-color:#555}
+#annot .tb button.on{background:#d92d20;border-color:#d92d20}
+#annot .cvw{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
+#cv{max-width:100%;max-height:100%;touch-action:none;background:#111}
+#modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px}
+#modal .m{background:var(--card);border-radius:16px;padding:18px;max-width:420px;width:100%}
+#modal .m p{margin:0 0 14px;font-size:17px}#modal .m .b{display:flex;flex-direction:column;gap:8px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom,0px));background:#222;color:#fff;padding:10px 16px;border-radius:12px;z-index:70;max-width:90%;text-align:center;font-size:15px}
+.tbl textarea{font-size:15px}
+.rowsm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+a.btn{display:block;text-align:center;text-decoration:none;border:1px solid var(--bd);border-radius:10px;padding:12px;background:var(--card);color:var(--pri)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div class="row" style="margin-bottom:8px">
+      <select id="walkSel" aria-label="Rundgang wählen"></select>
+      <button id="newWalk">＋ Neuer Rundgang</button>
+    </div>
+    <div class="grid3">
+      <input id="wDatum" type="date" aria-label="Datum">
+      <input id="wBeg" placeholder="Begeher" aria-label="Begeher" lang="de">
+      <input id="wBer" placeholder="Bereich (z. B. Gebäude F)" aria-label="Bereich" lang="de">
+    </div>
+  </div>
+
+  <div id="v-list">
+    <div id="instBanner" class="box warn" hidden>📲 Für Offline-Betrieb und Vollbild: Teilen-Symbol → „Zum Home-Bildschirm“, danach nur noch über das Symbol starten.</div>
+    <div id="bkBanner" class="box warn" hidden>⚠ Seit über 3 Tagen kein Backup. Unter „Export“ ein Backup speichern (Safari kann lokale Daten löschen).</div>
+    <div id="cnt" class="mut" style="margin:6px 2px"></div>
+    <div id="filters" class="chips" style="margin-bottom:6px"></div>
+    <div id="list"></div>
+  </div>
+
+  <div id="v-export" hidden>
+    <h2>Export</h2>
+    <div class="box">
+      <label for="exMode">Umfang</label>
+      <select id="exMode">
+        <option value="cur">Aktueller Rundgang</option>
+        <option value="walks">Alle Rundgänge – ein Blatt pro Rundgang</option>
+        <option value="all">Alle Rundgänge – eine Gesamtliste</option>
+      </select>
+      <div style="height:10px"></div>
+      <label for="exVer">Verantwortlicher</label>
+      <select id="exVer"></select>
+      <div style="height:10px"></div>
+      <label class="row" style="text-transform:none;font-size:16px;color:var(--tx)"><input id="exHide" type="checkbox" style="width:24px;min-height:24px;flex:0 0 24px"> Erledigte ausblenden</label>
+      <div id="exCnt" class="mut" style="margin-top:8px"></div>
+    </div>
+    <div class="box">
+      <div class="row" style="margin-bottom:8px"><button id="bZip" class="primary">Excel + Fotos (ZIP)</button><button id="bXlsx">Nur Excel</button></div>
+      <div class="row"><button id="bPdf">PDF-Bericht</button><a id="mailLnk" class="btn" href="#">E-Mail an Verantwortlichen</a></div>
+      <p class="mut" style="margin:8px 0 0">ZIP entpacken: die Excel liegt neben dem Ordner „Fotos“, die Links in der Excel öffnen die Originalfotos.</p>
+    </div>
+    <h2>Backup &amp; Import</h2>
+    <div class="box">
+      <div class="mut" id="bkInfo" style="margin-bottom:8px"></div>
+      <div class="row" style="margin-bottom:8px"><button id="bBackup">Backup speichern (JSON)</button><button id="bRestore">Backup wiederherstellen</button></div>
+      <div class="row" style="margin-bottom:8px"><button id="bPrev">Vorherigen Rundgang importieren (Excel)</button></div>
+      <div class="row"><button id="bStamm">Stammdaten importieren (Excel)</button><button id="bTpl">Vorlage</button></div>
+      <p class="mut" style="margin:8px 0 0">Nachverfolgung: offene Mängel aus einer früheren Export-Excel werden in den aktuellen Rundgang übernommen. Fotos des Vorgängers bleiben im alten ZIP; mit dem JSON-Backup werden Fotos vollständig wiederhergestellt.</p>
+    </div>
+  </div>
+
+  <div id="v-set" hidden class="tbl">
+    <h2>Einstellungen</h2>
+    <div class="box"><label for="sCat">Klassifizierung (eine pro Zeile)</label><textarea id="sCat" rows="8"></textarea></div>
+    <div class="box"><label>Prioritäten – Frist in Tagen</label>
+      <div class="rowsm"><div><span class="mut">hoch</span><input id="sPh" type="number" min="0" inputmode="numeric"></div><div><span class="mut">mittel</span><input id="sPm" type="number" min="0" inputmode="numeric"></div><div><span class="mut">niedrig</span><input id="sPn" type="number" min="0" inputmode="numeric"></div></div></div>
+    <div class="box"><label for="sBld">Gebäude (kommagetrennt)</label><input id="sBld">
+      <div style="height:10px"></div><label for="sRoomB">Räume je Gebäude (eine pro Zeile)</label>
+      <select id="sRoomB"></select><div style="height:8px"></div><textarea id="sRoom" rows="6"></textarea></div>
+    <div class="box"><label for="sVer">Verantwortliche (Zeile: Name; E-Mail)</label><textarea id="sVer" rows="8"></textarea></div>
+    <div class="box"><label for="sTb">Textbausteine (eine pro Zeile)</label><textarea id="sTb" rows="8"></textarea></div>
+  </div>
+</main>
+
+<button id="fab" class="primary">＋ Neuer Mangel</button>
+<nav>
+  <button data-view="list" class="on">Rundgang</button>
+  <button data-view="export">Export</button>
+  <button data-view="set">Einstellungen</button>
+</nav>
+
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-top"><button id="fClose">‹ Liste</button><b id="fTitle">Neuer Mangel</b><span id="saveState" class="mut"></span></div>
+  <div class="sheet-body">
+    <section><label>Gebäude</label><div id="bChips" class="chips big"></div></section>
+    <section><label for="roomIn">Raum / Halle</label>
+      <input id="roomIn" placeholder="z. B. 120 → wird zu F120" autocapitalize="characters" autocomplete="off" enterkeyhint="done">
+      <div id="roomChips" class="chips scroll" style="margin-top:8px"></div></section>
+    <section><label for="verIn">Verantwortlicher</label>
+      <div class="row"><input id="verIn" placeholder="Wählen oder neuen Namen eingeben" autocomplete="off" enterkeyhint="done"><button id="verAdd">＋</button></div>
+      <div id="verChips" class="chips" style="margin-top:8px"></div></section>
+    <section><label>Klassifizierung</label><div id="catChips" class="chips"></div></section>
+    <section><label>Priorität</label><div id="prioBtns" class="seg"></div>
+      <div class="row" style="margin-top:8px"><span class="mut" style="flex:0 0 auto">Frist</span><input id="frist" type="date"></div></section>
+    <section><label>Status</label><div id="statBtns" class="seg"></div></section>
+    <section><label for="desc">Mängelbeschreibung</label>
+      <textarea id="desc" rows="5" lang="de" placeholder="Tippen oder Mikrofon-Taste der Tastatur (Diktat)"></textarea>
+      <details><summary>Textbausteine</summary><div id="tbChips" class="chips"></div></details></section>
+    <section><label for="sol">Lösungsvorschlag</label>
+      <textarea id="sol" rows="3" lang="de" placeholder="Optional – auch per Diktat"></textarea></section>
+    <section><label>Fotos</label><div id="photos" class="photos"></div>
+      <div class="row"><button id="bCam">📷 Foto aufnehmen</button><button id="bLib">🖼 Mediathek</button></div>
+      <div id="nachRow" class="row" style="margin-top:8px" hidden><span class="mut" style="flex:1 1 100%">Nachweis „erledigt“:</span><button id="bCamN">📷 Nachweis-Foto</button><button id="bLibN">🖼 Mediathek</button></div></section>
+  </div>
+  <div class="sheet-bar"><button id="fDup">Kopie (gleicher Ort)</button><button id="fDel" class="danger">Löschen</button><button id="fDone" class="primary">Fertig</button></div>
+</div>
+
+<div id="annot" hidden>
+  <div class="tb">
+    <button data-tool="pen" class="on">Stift</button><button data-tool="circle">Kreis</button><button data-tool="arrow">Pfeil</button>
+    <button id="anUndo">↶</button><button id="anDel">Foto löschen</button><button id="anCancel">Abbrechen</button><button id="anOk" class="on" style="background:#15803d;border-color:#15803d">Übernehmen</button>
+  </div>
+  <div class="cvw"><canvas id="cv"></canvas></div>
+</div>
+
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<input type="file" id="camIn" accept="image/*" capture="environment" hidden>
+<input type="file" id="libIn" accept="image/*" multiple hidden>
+<input type="file" id="xlIn" accept=".xlsx" hidden>
+<input type="file" id="jsIn" accept=".json,application/json" hidden>
+
+<script>
+'use strict';
+/* ---------- Helfer ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const todayISO=()=>new Date().toLocaleDateString('sv-SE');
+const fmt=iso=>iso?iso.split('-').reverse().join('.'):'';
+const addDays=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('sv-SE')};
+const natCmp=(a,b)=>String(a).localeCompare(String(b),'de',{numeric:true});
+const PRIOS=['hoch','mittel','niedrig'];
+const STATS=[['offen','offen'],['bearbeitung','in Bearbeitung'],['erledigt','erledigt']];
+const statLabel=s=>(STATS.find(x=>x[0]===s)||[0,s])[1];
+let toastT;
+function toast(t,ms=2600){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,ms)}
+function modalBox(text,buttons){return new Promise(res=>{const m=$('#modal');m.innerHTML=`<div class="m"><p>${esc(text)}</p><div class="b">${buttons.map((b,i)=>`<button data-i="${i}" class="${i===0?'primary':''}">${esc(b)}</button>`).join('')}</div></div>`;m.hidden=false;m.onclick=e=>{const b=e.target.closest('button');if(b){m.hidden=true;res(+b.dataset.i)}}})}
+const confirmBox=async(t,ok='OK')=>(await modalBox(t,[ok,'Abbrechen']))===0;
+
+/* ---------- Bibliotheken (bei Bedarf, vorab still geladen) ---------- */
+const LIBS={excel:'exceljs.min.js',zip:'jszip.min.js',pdf:'jspdf.umd.min.js'};
+const libP={};
+function loadLib(k){if(libP[k])return libP[k];libP[k]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=LIBS[k];s.onload=res;s.onerror=()=>{libP[k]=null;rej(new Error('Bibliothek nicht ladbar (Internet nötig): '+k))};document.head.appendChild(s)});return libP[k]}
+
+/* ---------- Speicher (IndexedDB) ---------- */
+let idb=null;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('sos-rundgang',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('kv');d.createObjectStore('defects',{keyPath:'id'});d.createObjectStore('walks',{keyPath:'id'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function rq(store,mode,fn){return new Promise((res,rej)=>{if(!idb){res(undefined);return}try{const t=idb.transaction(store,mode);const r=fn(t.objectStore(store));t.oncomplete=()=>res(r&&r.result);t.onerror=t.onabort=()=>rej(t.error)}catch(e){rej(e)}})}
+const kvGet=k=>rq('kv','readonly',s=>s.get(k)), kvPut=(k,v)=>rq('kv','readwrite',s=>s.put(v,k));
+const getAll=st=>rq(st,'readonly',s=>s.getAll()), putRec=(st,o)=>rq(st,'readwrite',s=>s.put(o)), delRec=(st,id)=>rq(st,'readwrite',s=>s.delete(id)), clearSt=st=>rq(st,'readwrite',s=>s.clear());
+
+const DEF={
+ begeher:'',
+ buildings:['F1','F2','D','E','G1','G2'],
+ rooms:{},
+ responsibles:[],
+ categories:['Elektro','Brandschutz','Fluchtwege / Notausgänge','Lagerung / Regale','Gefahrstoffe','Ordnung / Sauberkeit','Absturz / Stolpern','Maschinen / Anlagen','Verkehrswege / Flurförderzeuge','Beleuchtung','Erste Hilfe / Notfall','Sonstiges'],
+ prioDays:{hoch:7,mittel:30,niedrig:90},
+ bausteine:['Fluchtweg verstellt','Feuerlöscher fehlt / nicht zugänglich','Kabel lose / Stolpergefahr','Verteiler nicht verschlossen / Zugang verstellt','Steckdose / Leitung beschädigt','Brandschutztür verkeilt','Lagerung instabil / über Regalhöhe','Gefahrstoffe ohne Kennzeichnung','Öl / Verschmutzung auf dem Boden','Beleuchtung defekt','Schutzeinrichtung fehlt / manipuliert','Verbandkasten fehlt / unvollständig'],
+ counters:{},lastBackup:0,curWalk:null
+};
+const S={settings:null,walks:[],defects:[],cur:null};
+const saveSettings=()=>kvPut('settings',S.settings);
+const saveWalk=w=>putRec('walks',w), saveDefect=d=>putRec('defects',d);
+
+/* ---------- Init ---------- */
+async function init(){
+ try{idb=await openDB()}catch(e){idb=null}
+ if(!idb)$('#cnt').textContent='⚠ Lokaler Speicher nicht verfügbar – Daten gehen beim Schließen verloren. Bitte oft exportieren.';
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ const saved=(await kvGet('settings'))||{};
+ S.settings=Object.assign(JSON.parse(JSON.stringify(DEF)),saved);
+ S.settings.prioDays=Object.assign({},DEF.prioDays,saved.prioDays||{});
+ S.walks=(await getAll('walks'))||[];S.defects=(await getAll('defects'))||[];
+ if(!S.walks.length){const w=mkWalk();S.walks.push(w);await saveWalk(w)}
+ S.cur=S.walks.find(w=>w.id===S.settings.curWalk)||S.walks.slice().sort((a,b)=>b.created-a.created)[0];
+ bind();renderList();
+ setTimeout(()=>{loadLib('excel').catch(()=>{});loadLib('zip').catch(()=>{});loadLib('pdf').catch(()=>{})},1500);
+}
+function mkWalk(){return {id:uid(),datum:todayISO(),begeher:(S.settings&&S.settings.begeher)||'',bereich:'',created:Date.now()}}
+
+/* ---------- Navigation ---------- */
+let view='list';
+function showView(v){view=v;['list','export','set'].forEach(x=>$('#v-'+x).hidden=x!==v);$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));$('#fab').hidden=v!=='list';
+ if(v==='list')renderList();if(v==='export')renderExport();if(v==='set')renderSettings();window.scrollTo(0,0)}
+
+/* ---------- Rundgang-Liste ---------- */
+const F={status:'alle',prio:'alle',ver:'alle'};
+const ort=d=>[d.gebaeude,d.raum].filter(Boolean).join(' · ')||'Ort offen';
+function renderList(){
+ const w=S.cur;
+ $('#walkSel').innerHTML=S.walks.slice().sort((a,b)=>b.datum.localeCompare(a.datum)||b.created-a.created).map(x=>`<option value="${x.id}" ${x.id===w.id?'selected':''}>${fmt(x.datum)}${x.bereich?' · '+esc(x.bereich):''}${x.begeher?' · '+esc(x.begeher):''}</option>`).join('');
+ $('#wDatum').value=w.datum;$('#wBeg').value=w.begeher||'';$('#wBer').value=w.bereich||'';
+ const all=S.defects.filter(d=>d.walkId===w.id);
+ const offen=all.filter(d=>d.status!=='erledigt').length;
+ $('#cnt').textContent=`${all.length} Mängel · ${offen} offen`;
+ $('#bkBanner').hidden=!(S.defects.length&&Date.now()-(S.settings.lastBackup||0)>3*864e5);
+ const vers=[...new Set(all.map(d=>d.verantwortlicher).filter(Boolean))].sort(natCmp);
+ const ch=(g,v,l)=>`<button class="chip ${F[g]===v?'on':''}" data-g="${g}" data-v="${esc(v)}">${esc(l)}</button>`;
+ $('#filters').innerHTML=[ch('status','alle','Alle'),...STATS.map(s=>ch('status',s[0],s[1])),...PRIOS.map(p=>ch('prio',p,p)),...vers.map(v=>ch('ver',v,'👤 '+v))].join('')+(F.status!=='alle'||F.prio!=='alle'||F.ver!=='alle'?`<button class="chip" data-g="reset">✕ Filter</button>`:'');
+ let list=all.filter(d=>(F.status==='alle'||d.status===F.status)&&(F.prio==='alle'||d.prio===F.prio)&&(F.ver==='alle'||d.verantwortlicher===F.ver));
+ list.sort((a,b)=>b.created-a.created);
+ const today=todayISO();
+ $('#list').innerHTML=list.length?list.map(d=>{
+  const th=d.fotos.find(f=>f.typ!=='nachweis')||d.fotos[0];
+  const over=d.frist&&d.frist<today&&d.status!=='erledigt';
+  return `<article class="card p-${d.prio} ${d.status==='erledigt'?'done':''}" data-id="${d.id}">
+   <div class="thumb">${th?`<img src="${th.thumb}" alt="">`:'kein Foto'}</div>
+   <div class="cbody"><div class="l1"><b>${esc(d.nr)}</b> · ${esc(ort(d))}</div>
+   <div class="l2"><span class="pill p-${d.prio}">${d.prio}</span> <span class="pill s-${d.status}">${esc(statLabel(d.status))}</span> ${esc(d.kategorie)}</div>
+   <div class="l3">${esc(d.beschreibung)||'<i class="mut">ohne Text</i>'}</div>
+   <div class="l4">${d.verantwortlicher?'👤 '+esc(d.verantwortlicher)+' · ':''}${d.frist?`<span class="${over?'over':''}">Frist ${fmt(d.frist)}${over?' (überfällig)':''}</span>`:''}${d.ausWalk?' · übernommen aus '+fmt(d.ausWalk):''}${d.fotos.length?' · '+d.fotos.length+' Foto(s)':''}</div>
+   <div class="acts">${d.status!=='erledigt'?'<button data-act="done">✓ Erledigt</button>':''}<button data-act="dup">Kopie</button></div></div></article>`}).join(''):`<div class="box mut">Noch keine Einträge${all.length?' (Filter aktiv)':''}. Unten rechts „Neuer Mangel“ tippen.</div>`;
+}
+
+/* ---------- Mangel-Formular ---------- */
+let D=null,photoTarget=null,photoTyp='mangel',saveT=null,isNew=false;
+function newDraft(base){const t=todayISO();return Object.assign({id:uid(),nr:null,walkId:S.cur.id,created:Date.now(),erfasst:t,gebaeude:'',raum:'',verantwortlicher:'',kategorie:'',prio:'mittel',status:'offen',frist:addDays(t,S.settings.prioDays.mittel),fristManuell:false,beschreibung:'',loesung:'',fotos:[],erledigtAm:'',ausWalk:''},base||{})}
+function openForm(d,fresh){D=d;isNew=!!fresh;photoTarget=D;
+ $('#fTitle').textContent=D.nr||'Neuer Mangel';$('#saveState').textContent='';
+ $('#roomIn').value=D.raum;$('#verIn').value='';$('#frist').value=D.frist||'';$('#desc').value=D.beschreibung;$('#sol').value=D.loesung;
+ renderBld();renderRoom();renderVer();renderCat();renderPrio();renderStat();renderTb();renderPhotos();
+ $('#sheet').hidden=false;document.body.style.overflow='hidden';$('.sheet-body').scrollTop=0}
+async function closeForm(){await persistDraft();clearTimeout(saveT);D=null;photoTarget=null;$('#sheet').hidden=true;document.body.style.overflow='';renderList()}
+const hasContent=d=>d.beschreibung.trim()||d.loesung.trim()||d.fotos.length;
+function nextNr(dt){const k=dt.slice(0,7);const c=(S.settings.counters[k]||0)+1;S.settings.counters[k]=c;return `SOS-${k.slice(0,4)}-${k.slice(5,7)}-${String(c).padStart(3,'0')}`}
+function touch(){$('#saveState').textContent='…';clearTimeout(saveT);saveT=setTimeout(persistDraft,300)}
+async function persistDraft(){
+ if(!D||!hasContent(D))return;
+ if(!D.nr){D.nr=nextNr(D.erfasst);await saveSettings();$('#fTitle').textContent=D.nr}
+ if(!S.defects.includes(D))S.defects.push(D);
+ learn();await saveDefect(D);$('#saveState').textContent='✓ gespeichert'}
+function learn(){let ch=false;const s=S.settings;
+ if(D.gebaeude&&D.raum){const a=s.rooms[D.gebaeude]=s.rooms[D.gebaeude]||[];if(!a.includes(D.raum)){a.push(D.raum);ch=true}}
+ if(D.verantwortlicher&&!s.responsibles.some(r=>r.name===D.verantwortlicher)){s.responsibles.unshift({name:D.verantwortlicher,email:''});ch=true}
+ if(ch)saveSettings()}
+const chip=(v,l,on,extra='')=>`<button class="chip ${on?'on':''}" data-v="${esc(v)}" ${extra}>${esc(l)}</button>`;
+function renderBld(){$('#bChips').innerHTML=S.settings.buildings.map(b=>chip(b,b,D.gebaeude===b)).join('')}
+const normRoom=(b,t)=>{let r=t.trim().toUpperCase();if(!r)return '';if(/^\d/.test(r)&&b)r=b[0]+r;return r};
+function renderRoom(){const b=D.gebaeude;const q=$('#roomIn').value.trim().toUpperCase();const pre=b?b[0]:'';
+ const list=(S.settings.rooms[b]||[]).slice().sort(natCmp).filter(r=>!q||r.includes(q)||r.includes(pre+q));
+ $('#roomChips').innerHTML=b?(list.length?list.map(r=>chip(r,r,D.raum===r)).join(''):'<span class="mut">Neue Räume einfach eintippen – sie werden gemerkt.</span>'):'<span class="mut">Erst Gebäude wählen.</span>'}
+function renderVer(){const q=$('#verIn').value.trim().toLowerCase();
+ $('#verChips').innerHTML=S.settings.responsibles.filter(r=>!q||r.name.toLowerCase().includes(q)).map(r=>chip(r.name,r.name,D.verantwortlicher===r.name)).join('')||'<span class="mut">Noch keine Verantwortlichen – Namen oben eingeben und ＋ tippen.</span>'}
+function addVer(){const n=$('#verIn').value.trim();if(!n)return;
+ let r=S.settings.responsibles.find(x=>x.name.toLowerCase()===n.toLowerCase());
+ if(!r){r={name:n,email:''};S.settings.responsibles.unshift(r);saveSettings()}
+ pickVer(r.name);$('#verIn').value='';renderVer()}
+function pickVer(n){D.verantwortlicher=D.verantwortlicher===n?'':n;
+ if(D.verantwortlicher){const a=S.settings.responsibles;const i=a.findIndex(r=>r.name===n);if(i>0){const [x]=a.splice(i,1);a.unshift(x);saveSettings()}}
+ renderVer();touch()}
+function renderCat(){$('#catChips').innerHTML=S.settings.categories.map(c=>chip(c,c,D.kategorie===c)).join('')}
+function renderPrio(){$('#prioBtns').innerHTML=PRIOS.map(p=>`<button data-v="${p}" class="${D.prio===p?'on':''}">${p}</button>`).join('')}
+function renderStat(){$('#statBtns').innerHTML=STATS.map(s=>`<button data-s="${s[0]}" class="${D.status===s[0]?'on':''}">${s[1]}</button>`).join('');$('#nachRow').hidden=D.status!=='erledigt'}
+function renderTb(){$('#tbChips').innerHTML=S.settings.bausteine.map((t,i)=>`<button class="chip" data-i="${i}">${esc(t)}</button>`).join('')}
+function renderPhotos(){$('#photos').innerHTML=D.fotos.map(f=>`<div class="ph ${f.typ==='nachweis'?'n':''}" data-id="${f.id}"><img src="${f.thumb}" alt=""><span>${f.typ==='nachweis'?'Nachweis':'✎ markieren'}</span></div>`).join('')}
+
+/* ---------- Fotos ---------- */
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>{i._u=u;res(i)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('Bild nicht lesbar'))};i.src=u})}
+function scale(src,max,q){const w0=src.naturalWidth||src.width,h0=src.naturalHeight||src.height;const k=Math.min(1,max/Math.max(w0,h0));const w=Math.round(w0*k),h=Math.round(h0*k);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(src,0,0,w,h);return {url:c.toDataURL('image/jpeg',q),w,h}}
+async function makePhoto(file,typ){const img=await loadImg(file);const full=scale(img,1600,.8),th=scale(img,240,.7);URL.revokeObjectURL(img._u);return {id:uid(),typ,full:full.url,thumb:th.url,tw:th.w,th:th.h}}
+async function onFiles(files){const t=photoTarget;if(!t||!files.length)return;
+ try{for(const f of files){t.fotos.push(await makePhoto(f,photoTyp))}}catch(e){toast('Foto konnte nicht verarbeitet werden')}
+ if(t===D){renderPhotos();await persistDraft()}else{await saveDefect(t);renderList()}}
+function pickPhoto(cam,typ,target){photoTyp=typ;photoTarget=target;(cam?$('#camIn'):$('#libIn')).click()}
+
+/* ---------- Foto markieren ---------- */
+let AN=null;
+function openAnnot(f){const img=new Image();img.onload=()=>{const cv=$('#cv');cv.width=img.naturalWidth;cv.height=img.naturalHeight;const ctx=cv.getContext('2d');ctx.drawImage(img,0,0);
+ const base=document.createElement('canvas');base.width=cv.width;base.height=cv.height;base.getContext('2d').drawImage(img,0,0);
+ AN={f,tool:'pen',hist:[],ctx,base,bctx:base.getContext('2d'),start:null,last:null,lw:Math.max(4,Math.round(cv.width/170))};
+ $$('#annot [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool==='pen'));$('#annot').hidden=false};img.src=f.full}
+function anPos(e){const cv=$('#cv'),r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}}
+function drawShape(c,tool,a,b,lw){c.strokeStyle='#ff2d2d';c.fillStyle='#ff2d2d';c.lineWidth=lw;c.lineCap='round';c.lineJoin='round';
+ if(tool==='circle'){c.beginPath();c.ellipse((a.x+b.x)/2,(a.y+b.y)/2,Math.max(1,Math.abs(b.x-a.x)/2),Math.max(1,Math.abs(b.y-a.y)/2),0,0,Math.PI*2);c.stroke()}
+ else if(tool==='arrow'){const ang=Math.atan2(b.y-a.y,b.x-a.x),hl=lw*5;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-hl*Math.cos(ang-.45),b.y-hl*Math.sin(ang-.45));c.lineTo(b.x-hl*Math.cos(ang+.45),b.y-hl*Math.sin(ang+.45));c.closePath();c.fill()}}
+function anRedraw(){AN.ctx.drawImage(AN.base,0,0)}
+function anDown(e){if(!AN)return;e.preventDefault();$('#cv').setPointerCapture(e.pointerId);AN.hist.push(AN.bctx.getImageData(0,0,AN.base.width,AN.base.height));if(AN.hist.length>8)AN.hist.shift();AN.start=AN.last=anPos(e)}
+function anMove(e){if(!AN||!AN.start)return;e.preventDefault();const p=anPos(e);
+ if(AN.tool==='pen'){AN.bctx.strokeStyle='#ff2d2d';AN.bctx.lineWidth=AN.lw;AN.bctx.lineCap=AN.bctx.lineJoin='round';AN.bctx.beginPath();AN.bctx.moveTo(AN.last.x,AN.last.y);AN.bctx.lineTo(p.x,p.y);AN.bctx.stroke();AN.last=p;anRedraw()}
+ else{anRedraw();drawShape(AN.ctx,AN.tool,AN.start,p,AN.lw);AN.last=p}}
+function anUp(e){if(!AN||!AN.start)return;if(AN.tool!=='pen')drawShape(AN.bctx,AN.tool,AN.start,AN.last,AN.lw);AN.start=null;anRedraw()}
+async function anOk(){const f=AN.f;const full=AN.base.toDataURL('image/jpeg',.82);const th=scale(AN.base,240,.7);f.full=full;f.thumb=th.url;f.tw=th.w;f.th=th.h;AN=null;$('#annot').hidden=true;renderPhotos();await persistDraft()}
+
+/* ---------- Excel / ZIP / PDF ---------- */
+function photoFiles(d){let n=0,e=0;return d.fotos.map(f=>{if(f.typ==='nachweis'){e++;return {f,name:`${d.nr}_erledigt${e>1?e:''}.jpg`}}n++;return {f,name:`${d.nr}_${n}.jpg`}})}
+function exportSel(){
+ const mode=$('#exMode').value,ver=$('#exVer').value,hide=$('#exHide').checked;
+ let list=mode==='cur'?S.defects.filter(d=>d.walkId===S.cur.id):S.defects.slice();
+ if(ver!=='__alle')list=list.filter(d=>(d.verantwortlicher||'')===ver);
+ if(hide)list=list.filter(d=>d.status!=='erledigt');
+ list.sort((a,b)=>natCmp(a.nr,b.nr));
+ let groups;
+ if(mode==='walks'){const ws=S.walks.slice().sort((a,b)=>a.datum.localeCompare(b.datum)||a.created-b.created);groups=ws.map(w=>({name:'Rundgang '+w.datum,list:list.filter(d=>d.walkId===w.id)})).filter(g=>g.list.length)}
+ else groups=[{name:mode==='cur'?'Rundgang '+S.cur.datum:'Gesamtliste',list}];
+ const seen={};groups.forEach(g=>{let n=g.name.slice(0,31),i=1;while(seen[n]){i++;n=g.name.slice(0,28)+' '+i}seen[n]=1;g.name=n});
+ return {list,groups,mode,ver}}
+const safe=s=>String(s).replace(/[^\wäöüÄÖÜß.-]+/g,'_');
+function baseName(sel){const v=sel.ver!=='__alle'?'_'+safe(sel.ver):'';return (sel.mode==='cur'?'SOS-Rundgang_'+S.cur.datum:'SOS-Gesamtliste_'+todayISO())+v}
+const COLS=[['Nr.',17],['Datum',11],['Gebäude',9],['Raum',10],['Kategorie',20],['Priorität',10],['Status',14],['Frist',11],['Verantwortlicher',20],['Mangelbeschreibung',48],['Lösungsvorschlag',36],['Foto 1',14],['Foto 2',14],['Foto 3',14],['Nachweis (erledigt)',14],['Erledigt am',11],['Fotodateien (Link)',36],['Nachverfolgung',24]];
+const isoDate=iso=>iso?new Date(iso+'T12:00:00Z'):null;
+const FILL={hoch:'FFFFC7CE',mittel:'FFFFE0B2',niedrig:'FFFFF2CC',erledigt:'FFC6EFCE'};
+async function buildXlsx(groups){
+ await loadLib('excel');
+ const wb=new ExcelJS.Workbook();wb.creator='SOS-Rundgang';wb.created=new Date();
+ const all=[];
+ for(const g of groups){
+  const ws=wb.addWorksheet(g.name,{views:[{state:'frozen',ySplit:1}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  ws.columns=COLS.map(c=>({header:c[0],width:c[1]}));
+  const hr=ws.getRow(1);hr.height=26;hr.eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0B5CAD'}};c.alignment={vertical:'middle',wrapText:true}});
+  ws.autoFilter={from:{row:1,column:1},to:{row:1,column:COLS.length}};
+  for(const d of g.list){
+   all.push(d);const pf=photoFiles(d);const m=pf.filter(x=>x.f.typ!=='nachweis'),n=pf.filter(x=>x.f.typ==='nachweis');
+   const row=ws.addRow([d.nr,isoDate(d.erfasst),d.gebaeude,d.raum,d.kategorie,d.prio,statLabel(d.status),isoDate(d.frist),d.verantwortlicher,d.beschreibung,d.loesung,'','','','',isoDate(d.erledigtAm),'',d.ausWalk?'Übernommen aus Rundgang '+fmt(d.ausWalk):'']);
+   const r=row.number;row.height=pf.length?80:32;
+   row.eachCell({includeEmpty:true},c=>{c.alignment={vertical:'top',wrapText:true}});
+   ['B','H','P'].forEach(k=>row.getCell(k).numFmt='dd.mm.yyyy');
+   row.getCell('F').fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[d.prio]}};
+   if(d.status==='erledigt')row.getCell('G').fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL.erledigt}};
+   if(pf.length){const c=row.getCell('Q');c.value={text:pf.map(x=>'Fotos/'+x.name).join('\n'),hyperlink:'Fotos/'+pf[0].name};c.font={color:{argb:'FF0563C1'},underline:true,size:9}}
+   const put=(x,ci)=>{const id=wb.addImage({base64:x.f.thumb,extension:'jpeg'});const k=Math.min(96/x.f.tw,96/x.f.th,1.5);ws.addImage(id,{tl:{col:ci+.06,row:r-1+.06},ext:{width:Math.round(x.f.tw*k),height:Math.round(x.f.th*k)}})};
+   m.slice(0,3).forEach((x,i)=>put(x,11+i));if(n[0])put(n[0],14);
+  }
+ }
+ const dw=wb.addWorksheet('_Daten');dw.state='hidden';dw.getCell('A1').value='SOS-DATA v1';
+ all.forEach((d,i)=>{const o={nr:d.nr,erfasst:d.erfasst,gebaeude:d.gebaeude,raum:d.raum,verantwortlicher:d.verantwortlicher,kategorie:d.kategorie,prio:d.prio,status:d.status,frist:d.frist,fristManuell:d.fristManuell,beschreibung:d.beschreibung,loesung:d.loesung,erledigtAm:d.erledigtAm,ausWalk:d.ausWalk||''};dw.getCell('A'+(i+2)).value=JSON.stringify(o)});
+ return new Blob([await wb.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+async function buildZip(sel){
+ await loadLib('zip');const xl=await buildXlsx(sel.groups);const zip=new JSZip();const base=baseName(sel);
+ zip.file(base+'.xlsx',xl);const fo=zip.folder('Fotos');
+ for(const d of sel.list)for(const x of photoFiles(d))fo.file(x.name,x.f.full.split(',')[1],{base64:true});
+ return {blob:await zip.generateAsync({type:'blob',compression:'STORE'}),name:base+'.zip'}}
+const pdfTxt=s=>String(s||'').replace(/[„“”]/g,'"').replace(/[‘’‚]/g,"'").replace(/[–—]/g,'-').replace(/…/g,'...').replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\u00FF]/g,'?');
+async function buildPdf(sel){
+ await loadLib('pdf');const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const M=12,W=210,TW=W-2*M;let y=M;
+ doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('SOS-Rundgang - Mängelbericht',M,y+5);y+=10;
+ doc.setFont('helvetica','normal');doc.setFontSize(10);
+ const w=S.cur;const kopf=sel.mode==='cur'?`Datum: ${fmt(w.datum)}   Begeher: ${pdfTxt(w.begeher)}   Bereich: ${pdfTxt(w.bereich)}`:`Erstellt: ${fmt(todayISO())}   Alle Rundgänge`;
+ doc.text(kopf,M,y);y+=5;doc.text(`Einträge: ${sel.list.length}${sel.ver!=='__alle'?'   Verantwortlicher: '+pdfTxt(sel.ver):''}`,M,y);y+=7;
+ const col={hoch:[217,45,32],mittel:[240,140,0],niedrig:[212,168,0]};
+ for(const d of sel.list){
+  const ph=d.fotos.filter(f=>f.typ!=='nachweis').slice(0,3);
+  const dl=doc.splitTextToSize(pdfTxt(d.beschreibung)||'-',TW-6),sl=d.loesung?doc.splitTextToSize('Lösungsvorschlag: '+pdfTxt(d.loesung),TW-6):[];
+  const h=8+5+dl.length*4.4+sl.length*4.4+(ph.length?34:0)+4;
+  if(y+h>282){doc.addPage();y=M}
+  doc.setDrawColor(200);doc.rect(M,y,TW,h);const c=col[d.prio]||[100,100,100];doc.setFillColor(c[0],c[1],c[2]);doc.rect(M,y,3,h,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(`${d.nr}  |  ${pdfTxt(ort(d))}  |  ${d.prio}  |  ${pdfTxt(statLabel(d.status))}`,M+5,y+5);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text(pdfTxt([d.kategorie,d.verantwortlicher?'Verantw.: '+d.verantwortlicher:'',d.frist?'Frist: '+fmt(d.frist):''].filter(Boolean).join('  |  ')),M+5,y+9.5);
+  let yy=y+14.5;doc.setFontSize(10);doc.text(dl,M+5,yy);yy+=dl.length*4.4;if(sl.length){doc.setTextColor(60);doc.text(sl,M+5,yy);doc.setTextColor(0);yy+=sl.length*4.4}
+  ph.forEach((f,i)=>{const k=Math.min(44/f.tw,30/f.th);doc.addImage(f.thumb,'JPEG',M+5+i*48,yy+1,f.tw*k,f.th*k)});
+  y+=h+3}
+ const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(120);doc.text(`Seite ${i}/${n}`,W-M-16,290);doc.setTextColor(0)}
+ return doc.output('blob')}
+
+/* ---------- Ausgabe ---------- */
+async function deliver(name,blob){
+ try{const file=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return true}}catch(e){if(e&&e.name==='AbortError')return false}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();return true}
+async function busy(fn){toast('Wird erstellt …',60000);try{await fn()}catch(e){console.error(e);toast('Fehler: '+(e.message||e),5000);return}$('#toast').hidden=$('#toast').textContent==='Wird erstellt …'}
+function renderExport(){
+ const vers=[...new Set(S.defects.map(d=>d.verantwortlicher).filter(Boolean))].sort(natCmp);const cur=$('#exVer').value||'__alle';
+ $('#exVer').innerHTML='<option value="__alle">Alle</option>'+vers.map(v=>`<option ${v===cur?'selected':''}>${esc(v)}</option>`).join('');
+ const sel=exportSel();const ph=sel.list.reduce((a,d)=>a+d.fotos.length,0);
+ $('#exCnt').textContent=`${sel.list.length} Mängel · ${ph} Fotos`;
+ $('#bkInfo').textContent=S.settings.lastBackup?'Letztes Backup: '+new Date(S.settings.lastBackup).toLocaleString('de-DE'):'Noch kein Backup erstellt.';
+ const ve=$('#exVer').value;const rec=(S.settings.responsibles.find(r=>r.name===ve)||{}).email||'';
+ const lines=sel.list.slice(0,40).map(d=>`${d.nr} | ${ort(d)} | ${d.prio} | ${(d.beschreibung||'').replace(/\s+/g,' ').slice(0,120)}`).join('\n');
+ $('#mailLnk').href='mailto:'+encodeURIComponent(rec)+'?subject='+encodeURIComponent('SOS-Rundgang '+fmt(S.cur.datum)+' - Mängel')+'&body='+encodeURIComponent('Hallo'+(ve!=='__alle'?' '+ve:'')+',\n\nfolgende Mängel wurden festgestellt:\n\n'+lines+'\n\nDie Excel-Liste mit Fotos hänge ich an.\n')}
+
+/* ---------- Einstellungen ---------- */
+function renderSettings(){const s=S.settings;
+ $('#sCat').value=s.categories.join('\n');$('#sPh').value=s.prioDays.hoch;$('#sPm').value=s.prioDays.mittel;$('#sPn').value=s.prioDays.niedrig;
+ $('#sBld').value=s.buildings.join(', ');$('#sVer').value=s.responsibles.map(r=>r.name+(r.email?'; '+r.email:'')).join('\n');$('#sTb').value=s.bausteine.join('\n');
+ const cb=$('#sRoomB').value||s.buildings[0];$('#sRoomB').innerHTML=s.buildings.map(b=>`<option ${b===cb?'selected':''}>${esc(b)}</option>`).join('');
+ $('#sRoom').value=(s.rooms[$('#sRoomB').value]||[]).slice().sort(natCmp).join('\n')}
+const lines=t=>t.split('\n').map(x=>x.trim()).filter(Boolean);
+
+/* ---------- Import ---------- */
+const cellText=v=>v==null?'':typeof v==='object'?(v.richText?v.richText.map(t=>t.text).join(''):(v.text||v.result||'')):String(v);
+async function readWb(file){await loadLib('excel');const wb=new ExcelJS.Workbook();await wb.xlsx.load(await file.arrayBuffer());return wb}
+async function importPrev(file){
+ const wb=await readWb(file);const ws=wb.getWorksheet('_Daten');if(!ws){toast('Keine SOS-Daten gefunden (Blatt „_Daten“ fehlt). Nur eigene Exporte sind importierbar.',5000);return}
+ let add=0,skip=0;const rows=[];ws.eachRow((r,i)=>{if(i>1)rows.push(cellText(r.getCell(1).value))});
+ for(const t of rows){let o;try{o=JSON.parse(t)}catch(e){continue}
+  if(!o.nr||o.status==='erledigt'||S.defects.some(x=>x.nr===o.nr)){skip++;continue}
+  const m=/^SOS-(\d{4})-(\d{2})-(\d+)$/.exec(o.nr);if(m){const k=m[1]+'-'+m[2];S.settings.counters[k]=Math.max(S.settings.counters[k]||0,+m[3])}
+  const d=Object.assign(newDraft(),o,{id:uid(),walkId:S.cur.id,created:Date.now()+add,fotos:[],ausWalk:o.ausWalk||o.erfasst});
+  S.defects.push(d);await saveDefect(d);add++;
+  if(d.verantwortlicher&&!S.settings.responsibles.some(r=>r.name===d.verantwortlicher))S.settings.responsibles.push({name:d.verantwortlicher,email:''});
+  if(d.gebaeude&&d.raum){const a=S.settings.rooms[d.gebaeude]=S.settings.rooms[d.gebaeude]||[];if(!a.includes(d.raum))a.push(d.raum)}}
+ await saveSettings();toast(`${add} offene Mängel übernommen${skip?` (${skip} übersprungen)`:''}.`,4000);renderExport()}
+async function importStamm(file){
+ const wb=await readWb(file);const ws=wb.worksheets[0];let nb=0,nr=0,nv=0;const s=S.settings;
+ ws.eachRow((row,i)=>{const b=cellText(row.getCell(1).value).trim(),r=cellText(row.getCell(2).value).trim().toUpperCase(),v=cellText(row.getCell(3).value).trim(),e=cellText(row.getCell(4).value).trim();
+  if(i===1&&/geb/i.test(b))return;
+  if(b&&!s.buildings.includes(b)){s.buildings.push(b);nb++}
+  if(b&&r){const a=s.rooms[b]=s.rooms[b]||[];if(!a.includes(r)){a.push(r);nr++}}
+  if(v){const x=s.responsibles.find(q=>q.name.toLowerCase()===v.toLowerCase());if(!x){s.responsibles.push({name:v,email:e});nv++}else if(e&&!x.email)x.email=e}});
+ await saveSettings();toast(`Importiert: ${nb} Gebäude, ${nr} Räume, ${nv} Verantwortliche.`,4000)}
+async function tpl(){await loadLib('excel');const wb=new ExcelJS.Workbook();const ws=wb.addWorksheet('Stammdaten');ws.columns=[{header:'Gebäude',width:12},{header:'Raum',width:12},{header:'Verantwortlicher',width:26},{header:'E-Mail',width:32}];ws.addRows([['F1','F120','Max Mustermann','max@example.de'],['G2','G490','','']]);ws.getRow(1).font={bold:true};
+ await deliver('SOS-Stammdaten-Vorlage.xlsx',new Blob([await wb.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}))}
+async function backup(){const blob=new Blob([JSON.stringify({v:1,exported:new Date().toISOString(),settings:S.settings,walks:S.walks,defects:S.defects})],{type:'application/json'});
+ if(await deliver(`SOS-Backup_${todayISO()}.json`,blob)){S.settings.lastBackup=Date.now();await saveSettings();renderExport()}}
+async function restore(file){let o;try{o=JSON.parse(await file.text())}catch(e){toast('Datei nicht lesbar');return}
+ if(!o||!o.defects||!o.walks){toast('Kein SOS-Backup');return}
+ if(!await confirmBox(`Backup mit ${o.defects.length} Mängeln einspielen? Alle aktuellen Daten auf diesem Gerät werden ersetzt.`,'Ersetzen'))return;
+ await clearSt('defects');await clearSt('walks');
+ S.settings=Object.assign(JSON.parse(JSON.stringify(DEF)),o.settings||{});S.walks=o.walks;S.defects=o.defects;
+ for(const w of S.walks)await saveWalk(w);for(const d of S.defects)await saveDefect(d);
+ S.cur=S.walks.find(w=>w.id===S.settings.curWalk)||S.walks[0];await saveSettings();toast('Backup eingespielt');renderExport()}
+
+/* ---------- Events ---------- */
+function bind(){
+ $$('nav button').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+ $('#fab').onclick=()=>openForm(newDraft(),true);
+ $('#walkSel').onchange=async e=>{S.cur=S.walks.find(w=>w.id===e.target.value);S.settings.curWalk=S.cur.id;await saveSettings();renderList()};
+ $('#newWalk').onclick=async()=>{const w=mkWalk();S.walks.push(w);S.cur=w;S.settings.curWalk=w.id;await saveWalk(w);await saveSettings();renderList();toast('Neuer Rundgang angelegt')};
+ const wf=(id,k)=>$(id).onchange=async e=>{S.cur[k]=e.target.value.trim?e.target.value.trim():e.target.value;if(k==='datum'&&!e.target.value){S.cur.datum=todayISO()}if(k==='begeher'){S.settings.begeher=S.cur.begeher;await saveSettings()}await saveWalk(S.cur);renderList()};
+ wf('#wDatum','datum');wf('#wBeg','begeher');wf('#wBer','bereich');
+ $('#filters').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.g==='reset'){F.status=F.prio=F.ver='alle'}else F[b.dataset.g]=F[b.dataset.g]===b.dataset.v&&b.dataset.v!=='alle'?'alle':b.dataset.v;renderList()};
+ $('#list').onclick=async e=>{const c=e.target.closest('.card');if(!c)return;const d=S.defects.find(x=>x.id===c.dataset.id);const a=e.target.closest('button');
+  if(!a){openForm(d,false);return}
+  if(a.dataset.act==='dup'){openForm(newDraft({gebaeude:d.gebaeude,raum:d.raum,verantwortlicher:d.verantwortlicher,kategorie:d.kategorie,prio:d.prio,frist:addDays(todayISO(),S.settings.prioDays[d.prio])}),true);toast('Kopie: Ort, Verantwortlicher, Klasse und Priorität übernommen')}
+  if(a.dataset.act==='done'){const i=await modalBox(`${d.nr} als erledigt markieren?`,['Mit Nachweis-Foto','Ohne Foto','Abbrechen']);if(i===2)return;
+   d.status='erledigt';d.erledigtAm=todayISO();await saveDefect(d);renderList();if(i===0)pickPhoto(true,'nachweis',d)}};
+ /* Formular */
+ $('#fClose').onclick=$('#fDone').onclick=closeForm;
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)persistDraft()});
+ $('#bChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.gebaeude=D.gebaeude===b.dataset.v?'':b.dataset.v;if(D.raum&&D.gebaeude&&D.raum[0]!==D.gebaeude[0]){D.raum='';$('#roomIn').value=''}renderBld();renderRoom();touch()};
+ $('#roomIn').oninput=()=>renderRoom();
+ $('#roomIn').onchange=e=>{D.raum=normRoom(D.gebaeude,e.target.value);e.target.value=D.raum;renderRoom();touch()};
+ $('#roomChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.raum=D.raum===b.dataset.v?'':b.dataset.v;$('#roomIn').value=D.raum;renderRoom();touch()};
+ $('#verIn').oninput=renderVer;$('#verIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addVer()}};$('#verAdd').onclick=addVer;
+ $('#verChips').onclick=e=>{const b=e.target.closest('button');if(b)pickVer(b.dataset.v)};
+ $('#catChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.kategorie=D.kategorie===b.dataset.v?'':b.dataset.v;renderCat();touch()};
+ $('#prioBtns').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.prio=b.dataset.v;if(!D.fristManuell){D.frist=addDays(D.erfasst,S.settings.prioDays[D.prio]);$('#frist').value=D.frist}renderPrio();touch()};
+ $('#frist').onchange=e=>{D.frist=e.target.value;D.fristManuell=true;touch()};
+ $('#statBtns').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.status=b.dataset.s;D.erledigtAm=D.status==='erledigt'?todayISO():'';renderStat();touch()};
+ $('#desc').oninput=e=>{D.beschreibung=e.target.value;touch()};$('#sol').oninput=e=>{D.loesung=e.target.value;touch()};
+ $('#tbChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;const t=S.settings.bausteine[+b.dataset.i];const cur=$('#desc').value.trim();$('#desc').value=cur?cur.replace(/[.!]?$/,'. ')+t:t;D.beschreibung=$('#desc').value;touch()};
+ $('#bCam').onclick=()=>pickPhoto(true,'mangel',D);$('#bLib').onclick=()=>pickPhoto(false,'mangel',D);
+ $('#bCamN').onclick=()=>pickPhoto(true,'nachweis',D);$('#bLibN').onclick=()=>pickPhoto(false,'nachweis',D);
+ $('#camIn').onchange=$('#libIn').onchange=async e=>{const fs=[...e.target.files];e.target.value='';await onFiles(fs)};
+ $('#photos').onclick=e=>{const p=e.target.closest('.ph');if(p)openAnnot(D.fotos.find(f=>f.id===p.dataset.id))};
+ $('#fDup').onclick=async()=>{await persistDraft();const b=D;D=null;const nd=newDraft({gebaeude:b.gebaeude,raum:b.raum,verantwortlicher:b.verantwortlicher,kategorie:b.kategorie,prio:b.prio,frist:addDays(todayISO(),S.settings.prioDays[b.prio])});openForm(nd,true);toast('Kopie: Ort, Verantwortlicher, Klasse und Priorität übernommen')};
+ $('#fDel').onclick=async()=>{if(!await confirmBox('Diesen Mangel löschen?','Löschen'))return;clearTimeout(saveT);const i=S.defects.indexOf(D);if(i>=0){S.defects.splice(i,1);await delRec('defects',D.id)}D=null;photoTarget=null;$('#sheet').hidden=true;document.body.style.overflow='';renderList()};
+ /* Markieren */
+ const cv=$('#cv');cv.onpointerdown=anDown;cv.onpointermove=anMove;cv.onpointerup=cv.onpointercancel=anUp;
+ $$('#annot [data-tool]').forEach(b=>b.onclick=()=>{AN.tool=b.dataset.tool;$$('#annot [data-tool]').forEach(x=>x.classList.toggle('on',x===b))});
+ $('#anUndo').onclick=()=>{if(AN&&AN.hist.length){AN.bctx.putImageData(AN.hist.pop(),0,0);anRedraw()}};
+ $('#anCancel').onclick=()=>{AN=null;$('#annot').hidden=true};
+ $('#anOk').onclick=anOk;
+ $('#anDel').onclick=async()=>{if(!await confirmBox('Dieses Foto löschen?','Löschen'))return;D.fotos=D.fotos.filter(f=>f!==AN.f);AN=null;$('#annot').hidden=true;renderPhotos();await persistDraft();if(!hasContent(D)){$('#saveState').textContent=''}};
+ /* Export */
+ ['#exMode','#exVer','#exHide'].forEach(id=>$(id).onchange=renderExport);
+ $('#bXlsx').onclick=()=>busy(async()=>{const s=exportSel();if(!s.list.length){toast('Nichts zu exportieren');return}await deliver(baseName(s)+'.xlsx',await buildXlsx(s.groups))});
+ $('#bZip').onclick=()=>busy(async()=>{const s=exportSel();if(!s.list.length){toast('Nichts zu exportieren');return}const z=await buildZip(s);if(await deliver(z.name,z.blob)){S.settings.lastBackup=Date.now();await saveSettings()}});
+ $('#bPdf').onclick=()=>busy(async()=>{const s=exportSel();if(!s.list.length){toast('Nichts zu exportieren');return}await deliver(baseName(s)+'.pdf',await buildPdf(s))});
+ $('#bBackup').onclick=()=>busy(backup);
+ $('#bRestore').onclick=()=>{$('#jsIn').click()};$('#jsIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)busy(()=>restore(f))};
+ let xlMode='';$('#bPrev').onclick=()=>{xlMode='prev';$('#xlIn').click()};$('#bStamm').onclick=()=>{xlMode='stamm';$('#xlIn').click()};
+ $('#xlIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)busy(()=>xlMode==='prev'?importPrev(f):importStamm(f))};
+ $('#bTpl').onclick=()=>busy(tpl);
+ /* Einstellungen */
+ const sv=async()=>{await saveSettings()};
+ $('#sCat').onchange=e=>{S.settings.categories=lines(e.target.value);sv()};
+ [['#sPh','hoch'],['#sPm','mittel'],['#sPn','niedrig']].forEach(([id,k])=>$(id).onchange=e=>{S.settings.prioDays[k]=Math.max(0,parseInt(e.target.value)||0);sv()});
+ $('#sBld').onchange=e=>{S.settings.buildings=e.target.value.split(',').map(x=>x.trim()).filter(Boolean);sv();renderSettings()};
+ $('#sRoomB').onchange=()=>{$('#sRoom').value=(S.settings.rooms[$('#sRoomB').value]||[]).slice().sort(natCmp).join('\n')};
+ $('#sRoom').onchange=e=>{S.settings.rooms[$('#sRoomB').value]=[...new Set(lines(e.target.value.toUpperCase()))];sv()};
+ $('#sVer').onchange=e=>{S.settings.responsibles=lines(e.target.value).map(l=>{const [n,...m]=l.split(';');return {name:n.trim(),email:m.join(';').trim()}}).filter(r=>r.name);sv()};
+ $('#sTb').onchange=e=>{S.settings.bausteine=lines(e.target.value);sv()};
+}
+const standalone=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+document.getElementById('instBanner').hidden=standalone;
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+init();
+</script>
+</body>
+</html>
